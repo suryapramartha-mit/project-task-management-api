@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
 
 @Repository
-public interface TaskRepository extends JpaRepository<Project, Long> {
+public interface TaskRepository extends JpaRepository<Task, Long> {
 
     @Query("SELECT t FROM Task t " +
             "JOIN t.project p " +

@@ -23,3 +23,6 @@ INSERT INTO TASK(id, task_name, description, status, due_date, priority, assigne
 (8, 'Task 8', 'Description for Task 8', 'COMPLETED', '2023-05-30', 4, 3, 1),
 (9, 'Task 9', 'Description for Task 9', 'PENDING', '2023-08-02', 1, 4, 2),
 (10, 'Task 10', 'Description for Task 10', 'IN_PROGRESS', '2023-09-10', 3, 5, 3);
+
+-- Max existing for TASK IS 10
+ALTER TABLE TASK ALTER COLUMN ID RESTART WITH 11;
