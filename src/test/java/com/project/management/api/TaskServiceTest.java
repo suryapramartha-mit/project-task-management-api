@@ -11,6 +11,7 @@ import com.project.management.api.exception.DataNotFoundException;
 import com.project.management.api.repository.EmployeeRepository;
 import com.project.management.api.repository.ProjectRepository;
 import com.project.management.api.repository.TaskRepository;
+import com.project.management.api.service.NotificationService;
 import com.project.management.api.service.TaskService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,6 +39,9 @@ class TaskServiceTest {
 
     @Mock
     private EmployeeRepository employeeRepository;
+
+    @Mock
+    private NotificationService notificationService;
 
     @InjectMocks
     private TaskService taskService;
@@ -92,6 +96,7 @@ class TaskServiceTest {
         Employee assignee = Employee.builder()
                 .id(2L)
                 .name("Test Name")
+                .email("test@mail.com")
                 .build();
 
         Task savedTask = Task.builder()
@@ -126,6 +131,7 @@ class TaskServiceTest {
         verify(projectRepository, times(1)).findById(1L);
         verify(employeeRepository, times(1)).findById(2L);
         verify(taskRepository, times(1)).save(any(Task.class));
+        verify(notificationService).sendTaskNotification("Test Name", "Task A", "test@mail.com");
     }
 
     @Test

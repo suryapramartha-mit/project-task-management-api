@@ -35,8 +35,6 @@ public class TaskService {
         return result.map(task -> TaskResponse.builder()
                 .id(task.getId())
                 .projectName(task.getProject().getProjectName())
-                .projectStartDate(task.getProject().getStartDate())
-                .projectEndDate(task.getProject().getEndDate())
                 .name(task.getTaskName())
                 .description(task.getDescription())
                 .dueDate(task.getDueDate())
