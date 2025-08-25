@@ -2,6 +2,7 @@ package com.project.management.api.exception;
 
 import com.project.management.api.dto.ErrorDTO;
 import com.project.management.api.util.ApiResponse;
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,17 @@ public class GlobalExceptionHandler {
         List<ErrorDTO> errors = ex.getBindingResult().getFieldErrors()
                 .stream()
                 .map(error -> new ErrorDTO(error.getField(), error.getDefaultMessage()))
+                .toList();
+
+        ApiResponse<Object> response = ApiResponse.error(HttpStatus.BAD_REQUEST.value(), "Validation failed", errors);
+        return ResponseEntity.badRequest().body(response);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ApiResponse<Object>> handleConstraintViolationExceptions(ConstraintViolationException ex) {
+        List<ErrorDTO> errors = ex.getConstraintViolations()
+                .stream()
+                .map(error -> new ErrorDTO(null, error.getMessage()))
                 .toList();
 
         ApiResponse<Object> response = ApiResponse.error(HttpStatus.BAD_REQUEST.value(), "Validation failed", errors);

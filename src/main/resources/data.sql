@@ -17,4 +17,9 @@ INSERT INTO TASK(id, task_name, description, status, due_date, priority, assigne
 (2, 'Task 2', 'Description for Task 2', 'IN_PROGRESS', '2023-07-01', 2, 2, 1),
 (3, 'Task 3', 'Description for Task 3', 'COMPLETED', '2023-05-30', 4, 3, 2),
 (4, 'Task 4', 'Description for Task 4', 'PENDING', '2023-08-20', 1, 4, 2),
-(5, 'Task 5', 'Description for Task 5', 'IN_PROGRESS', '2023-09-10', 3, 5, 3);
+(5, 'Task 5', 'Description for Task 5', 'IN_PROGRESS', '2023-09-10', 3, 5, 3),
+(6, 'Task 6', 'Description for Task 6', 'PENDING', '2023-06-15', 1, 2, 1),
+(7, 'Task 7', 'Description for Task 7', 'IN_PROGRESS', '2023-05-01', 2, 2, 1),
+(8, 'Task 8', 'Description for Task 8', 'COMPLETED', '2023-05-30', 4, 3, 1),
+(9, 'Task 9', 'Description for Task 9', 'PENDING', '2023-08-02', 1, 4, 2),
+(10, 'Task 10', 'Description for Task 10', 'IN_PROGRESS', '2023-09-10', 3, 5, 3);

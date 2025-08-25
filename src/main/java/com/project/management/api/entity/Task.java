@@ -3,12 +3,14 @@ package com.project.management.api.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDate;
 
 @Entity
 @Table(name = "task")
 @Getter
+@Setter
 @NoArgsConstructor
 public class Task {
 
@@ -32,9 +34,9 @@ public class Task {
     @Column(name = "priority")
     private Integer priority; // 1 (highest) to 5 (lowest)
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "assigned_to")
-    private Employee employee;
+    private Employee assignedTo;
 
     @ManyToOne
     @JoinColumn(name = "project_id", nullable = false)
