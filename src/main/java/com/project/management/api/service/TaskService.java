@@ -20,11 +20,13 @@ public class TaskService {
     private final TaskRepository taskRepository;
     private final ProjectRepository projectRepository;
     private final EmployeeRepository employeeRepository;
+    private final NotificationService notificationService;
 
-    public TaskService(TaskRepository projectRepository, ProjectRepository projectRepository1, EmployeeRepository employeeRepository) {
+    public TaskService(TaskRepository projectRepository, ProjectRepository projectRepository1, EmployeeRepository employeeRepository, NotificationService notificationService) {
         this.taskRepository = projectRepository;
         this.projectRepository = projectRepository1;
         this.employeeRepository = employeeRepository;
+        this.notificationService = notificationService;
     }
 
     public Page<TaskResponse> getTasks(Long projectId, LocalDate startDate, LocalDate endDate, PageRequest pageRequest) {
@@ -61,6 +63,9 @@ public class TaskService {
                 .project(project)
                 .assignedTo(assignee)
                 .build());
+
+        //notify the assignee to email
+        notificationService.sendTaskNotification(assignee.getName(), savedTask.getTaskName(), assignee.getEmail());
 
         return CreateTaskResponse.builder()
                 .id(savedTask.getId())

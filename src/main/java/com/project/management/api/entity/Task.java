@@ -34,6 +34,9 @@ public class Task {
     @Column(name = "priority")
     private Integer priority; // 1 (highest) to 5 (lowest)
 
+    @Version
+    private Integer version;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "assigned_to")
     private Employee assignedTo;
