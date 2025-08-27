@@ -31,7 +31,7 @@ public class TaskService {
     }
 
     public Page<TaskResponse> getTasks(Long projectId, LocalDate startDate, LocalDate endDate, PageRequest pageRequest) {
-        var result = taskRepository.findAllTaskByProject(projectId, startDate, endDate, pageRequest);
+        var result = taskRepository.findAllTask(projectId, startDate, endDate, pageRequest);
 
         return result.map(task -> TaskResponse.builder()
                 .id(task.getId())

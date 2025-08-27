@@ -1,6 +1,5 @@
 package com.project.management.api.repository;
 
-import com.project.management.api.entity.Project;
 import com.project.management.api.entity.Task;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,9 +13,8 @@ import java.time.LocalDate;
 public interface TaskRepository extends JpaRepository<Task, Long> {
 
     @Query("SELECT t FROM Task t " +
-            "JOIN t.project p " +
             "WHERE (:startDate IS NULL OR t.dueDate >= :startDate) " +
             "AND (:endDate IS NULL OR t.dueDate <= :endDate) " +
-            "AND (:projectId IS NULL OR p.id = :projectId)")
-    Page<Task> findAllTaskByProject(Long projectId, LocalDate startDate, LocalDate endDate, Pageable pageable);
+            "AND (:projectId IS NULL OR t.project.id = :projectId)")
+    Page<Task> findAllTask(Long projectId, LocalDate startDate, LocalDate endDate, Pageable pageable);
 }

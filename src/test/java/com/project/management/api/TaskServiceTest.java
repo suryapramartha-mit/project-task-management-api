@@ -53,7 +53,7 @@ class TaskServiceTest {
 
         Page<Task> page = getData(projectId, startDate, endDate);
         // When
-        when(taskRepository.findAllTaskByProject(projectId, startDate, endDate, pageRequest))
+        when(taskRepository.findAllTask(projectId, startDate, endDate, pageRequest))
                 .thenReturn(page);
 
         Page<TaskResponse> result = taskService.getTasks(projectId, startDate, endDate, pageRequest);
@@ -68,7 +68,7 @@ class TaskServiceTest {
         assertEquals("Test Project", response.getProjectName());
 
         // Verify repository was called
-        verify(taskRepository, times(1)).findAllTaskByProject(projectId, startDate, endDate, pageRequest);
+        verify(taskRepository, times(1)).findAllTask(projectId, startDate, endDate, pageRequest);
     }
 
     @Test

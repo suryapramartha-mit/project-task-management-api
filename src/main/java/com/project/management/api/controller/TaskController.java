@@ -28,8 +28,9 @@ public class TaskController {
     @Operation(summary = "Get tasks with various filters")
     @Tag(name = "Task API")
     public ResponseEntity<ApiResponse<Page<TaskResponse>>> getTasks(@Valid TaskFilterDTO filter) {
+        var direction = Sort.Direction.valueOf(filter.getSort().name());
         var result = taskService.getTasks(filter.getProjectId(), filter.getStartDate(), filter.getEndDate(),
-                PageRequest.of(filter.getPage(), filter.getSize(), Sort.Direction.ASC, filter.getSortBy().getField()));
+                PageRequest.of(filter.getPage(), filter.getSize(), direction, filter.getSortBy().getField()));
         return ResponseEntity.ok(ApiResponse.success(result, "Success"));
     }
 
