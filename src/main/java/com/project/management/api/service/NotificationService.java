@@ -21,7 +21,7 @@ public class NotificationService {
     }
     private void sendTaskNotification(String assigneeName, String taskName, String email) {
         log.info("Sending email to {}", email);
-        log.info("[EMAIL] Task '{}' has been created and assigned to {}.", taskName, assigneeName);
+        log.info("[EMAIL] Task '{}' has been created or updated and assigned to {}.", taskName, assigneeName);
     }
 }
 

@@ -1,9 +1,6 @@
 package com.project.management.api.controller;
 
-import com.project.management.api.dto.CreateTaskRequest;
-import com.project.management.api.dto.CreateTaskResponse;
-import com.project.management.api.dto.TaskFilterDTO;
-import com.project.management.api.dto.TaskResponse;
+import com.project.management.api.dto.*;
 import com.project.management.api.service.TaskService;
 import com.project.management.api.util.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -42,5 +39,13 @@ public class TaskController {
     public ResponseEntity<ApiResponse<CreateTaskResponse>> createTask(@RequestBody @Valid CreateTaskRequest request) {
         var newTask = taskService.createTask(request);
         return ResponseEntity.ok(ApiResponse.success(newTask, "Task created successfully"));
+    }
+    @PutMapping(value = "/{taskId}", produces = "application/json")
+    @Operation(summary = "Update Task")
+    @Tag(name = "Task API")
+    public ResponseEntity<ApiResponse<CreateTaskResponse>> updateTask(@PathVariable Long taskId,
+            @RequestBody @Valid UpdateTaskRequest request) {
+        var updatedTask = taskService.updateTask(request, taskId);
+        return ResponseEntity.ok(ApiResponse.success(updatedTask, "Task updated successfully"));
     }
 }

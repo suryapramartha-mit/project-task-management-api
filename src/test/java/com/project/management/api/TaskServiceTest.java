@@ -1,9 +1,6 @@
 package com.project.management.api;
 
-import com.project.management.api.dto.CreateTaskRequest;
-import com.project.management.api.dto.CreateTaskResponse;
-import com.project.management.api.dto.SendTaskNotificationDTO;
-import com.project.management.api.dto.TaskResponse;
+import com.project.management.api.dto.*;
 import com.project.management.api.entity.Employee;
 import com.project.management.api.entity.Project;
 import com.project.management.api.entity.Task;
@@ -163,6 +160,70 @@ class TaskServiceTest {
 
         // Then
         assertThrows(DataNotFoundException.class, () -> taskService.createTask(request));
+    }
+
+    //update task
+    @Test
+    void testSuccess_UpdateTask() {
+        // Given
+        Long taskId = 1L;
+        Long assigneeId = 2L;
+
+        Project project = new Project();
+        project.setId(1L);
+        project.setProjectName("Project A");
+
+        Employee assignee = new Employee();
+        assignee.setId(assigneeId);
+        assignee.setName("New Test name");
+
+        Task existingTask = new Task();
+        existingTask.setId(taskId);
+        existingTask.setTaskName("Old Task");
+        existingTask.setDescription("Old Description");
+        existingTask.setPriority(1);
+        existingTask.setStatus("PENDING");
+        existingTask.setVersion(0);
+        existingTask.setProject(project);
+        existingTask.setAssignedTo(assignee);
+
+        UpdateTaskRequest request = new UpdateTaskRequest();
+        request.setTaskName("New Task");
+        request.setDescription("New Description");
+        request.setPriority(2);
+        request.setStatus(StatusEnum.IN_PROGRESS);
+        request.setAssignedToId(assigneeId);
+
+        when(taskRepository.findById(taskId)).thenReturn(Optional.of(existingTask));
+        when(employeeRepository.findById(assigneeId)).thenReturn(Optional.of(assignee));
+        when(taskRepository.save(any(Task.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        // When
+        CreateTaskResponse response = taskService.updateTask(request, taskId);
+
+        // Then
+        assertNotNull(response);
+        assertEquals(taskId, response.getId());
+        assertEquals("New Task", response.getName());
+        assertEquals("New Description", response.getDescription());
+        assertEquals(2, response.getPriority());
+        assertEquals(StatusEnum.IN_PROGRESS.name(), response.getStatus());
+        assertEquals("New Test name", response.getAssignedTo());
+
+        verify(eventPublisher).publishEvent(any(SendTaskNotificationDTO.class));
+    }
+
+    @Test
+    void testError_UpdateTask_TaskNotFound() {
+        Long taskId = 99L;
+        UpdateTaskRequest request = new UpdateTaskRequest();
+
+        when(taskRepository.findById(taskId)).thenReturn(Optional.empty());
+
+        assertThrows(DataNotFoundException.class, () -> taskService.updateTask(request, taskId));
+
+        verify(taskRepository).findById(taskId);
+        verifyNoInteractions(employeeRepository, eventPublisher);
     }
     private static Page<Task> getData(Long projectId, LocalDate startDate, LocalDate endDate) {
         Project project = new Project();

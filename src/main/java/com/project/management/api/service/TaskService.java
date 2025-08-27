@@ -1,9 +1,6 @@
 package com.project.management.api.service;
 
-import com.project.management.api.dto.CreateTaskRequest;
-import com.project.management.api.dto.CreateTaskResponse;
-import com.project.management.api.dto.SendTaskNotificationDTO;
-import com.project.management.api.dto.TaskResponse;
+import com.project.management.api.dto.*;
 import com.project.management.api.entity.Task;
 import com.project.management.api.enums.StatusEnum;
 import com.project.management.api.exception.DataNotFoundException;
@@ -17,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 @Service
 public class TaskService {
@@ -76,6 +74,38 @@ public class TaskService {
                 .status(savedTask.getStatus())
                 .projectName(project.getProjectName())
                 .assignedTo(assignee.getName())
+                .build();
+    }
+
+    @Transactional
+    public CreateTaskResponse updateTask(UpdateTaskRequest request, Long taskId) {
+        var existingTask = taskRepository.findById(taskId)
+                .orElseThrow(() -> new DataNotFoundException("Task not found with id: " + taskId));
+
+        Optional.ofNullable(request.getTaskName()).ifPresent(existingTask::setTaskName);
+        Optional.ofNullable(request.getDescription()).ifPresent(existingTask::setDescription);
+        Optional.ofNullable(request.getDueDate()).ifPresent(existingTask::setDueDate);
+        Optional.ofNullable(request.getPriority()).ifPresent(existingTask::setPriority);
+        Optional.ofNullable(request.getStatus()).ifPresent(statusEnum -> existingTask.setStatus(statusEnum.name()));
+
+        Optional.ofNullable(request.getAssignedToId()).ifPresent(assigneeId -> {
+            var assignee = employeeRepository.findById(assigneeId)
+                    .orElseThrow(() -> new DataNotFoundException("Assignee not found with id: " + assigneeId));
+            existingTask.setAssignedTo(assignee);
+        });
+
+        var updatedTask = taskRepository.save(existingTask);
+        eventPublisher.publishEvent(new SendTaskNotificationDTO(updatedTask));
+
+        return CreateTaskResponse.builder()
+                .id(updatedTask.getId())
+                .name(updatedTask.getTaskName())
+                .description(updatedTask.getDescription())
+                .priority(updatedTask.getPriority())
+                .dueDate(updatedTask.getDueDate())
+                .status(updatedTask.getStatus())
+                .projectName(updatedTask.getProject().getProjectName())
+                .assignedTo(updatedTask.getAssignedTo().getName())
                 .build();
     }
 }
