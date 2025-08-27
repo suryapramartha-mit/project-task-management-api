@@ -2,6 +2,7 @@ package com.project.management.api;
 
 import com.project.management.api.dto.CreateTaskRequest;
 import com.project.management.api.dto.CreateTaskResponse;
+import com.project.management.api.dto.SendTaskNotificationDTO;
 import com.project.management.api.dto.TaskResponse;
 import com.project.management.api.entity.Employee;
 import com.project.management.api.entity.Project;
@@ -11,13 +12,13 @@ import com.project.management.api.exception.DataNotFoundException;
 import com.project.management.api.repository.EmployeeRepository;
 import com.project.management.api.repository.ProjectRepository;
 import com.project.management.api.repository.TaskRepository;
-import com.project.management.api.service.NotificationService;
 import com.project.management.api.service.TaskService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -33,15 +34,14 @@ import static org.mockito.Mockito.*;
 class TaskServiceTest {
 
     @Mock
+    private ApplicationEventPublisher eventPublisher;
+    @Mock
     private TaskRepository taskRepository;
     @Mock
     private ProjectRepository projectRepository;
 
     @Mock
     private EmployeeRepository employeeRepository;
-
-    @Mock
-    private NotificationService notificationService;
 
     @InjectMocks
     private TaskService taskService;
@@ -117,7 +117,6 @@ class TaskServiceTest {
 
         CreateTaskResponse response = taskService.createTask(request);
 
-        // Then
         assertNotNull(response);
         assertEquals(10L, response.getId());
         assertEquals("Task A", response.getName());
@@ -131,7 +130,7 @@ class TaskServiceTest {
         verify(projectRepository, times(1)).findById(1L);
         verify(employeeRepository, times(1)).findById(2L);
         verify(taskRepository, times(1)).save(any(Task.class));
-        verify(notificationService).sendTaskNotification("Test Name", "Task A", "test@mail.com");
+        verify(eventPublisher).publishEvent(any(SendTaskNotificationDTO.class));
     }
 
     @Test

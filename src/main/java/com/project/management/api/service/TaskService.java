@@ -2,6 +2,7 @@ package com.project.management.api.service;
 
 import com.project.management.api.dto.CreateTaskRequest;
 import com.project.management.api.dto.CreateTaskResponse;
+import com.project.management.api.dto.SendTaskNotificationDTO;
 import com.project.management.api.dto.TaskResponse;
 import com.project.management.api.entity.Task;
 import com.project.management.api.enums.StatusEnum;
@@ -9,9 +10,11 @@ import com.project.management.api.exception.DataNotFoundException;
 import com.project.management.api.repository.EmployeeRepository;
 import com.project.management.api.repository.ProjectRepository;
 import com.project.management.api.repository.TaskRepository;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 
@@ -20,13 +23,13 @@ public class TaskService {
     private final TaskRepository taskRepository;
     private final ProjectRepository projectRepository;
     private final EmployeeRepository employeeRepository;
-    private final NotificationService notificationService;
+    private final ApplicationEventPublisher eventPublisher;
 
-    public TaskService(TaskRepository projectRepository, ProjectRepository projectRepository1, EmployeeRepository employeeRepository, NotificationService notificationService) {
+    public TaskService(TaskRepository projectRepository, ProjectRepository projectRepository1, EmployeeRepository employeeRepository, ApplicationEventPublisher eventPublisher) {
         this.taskRepository = projectRepository;
         this.projectRepository = projectRepository1;
         this.employeeRepository = employeeRepository;
-        this.notificationService = notificationService;
+        this.eventPublisher = eventPublisher;
     }
 
     public Page<TaskResponse> getTasks(Long projectId, LocalDate startDate, LocalDate endDate, PageRequest pageRequest) {
@@ -45,6 +48,7 @@ public class TaskService {
         );
     }
 
+    @Transactional
     public CreateTaskResponse createTask(CreateTaskRequest request) {
         var project = projectRepository.findById(request.getProjectId())
                 .orElseThrow(() -> new DataNotFoundException("Project not found"));
@@ -61,9 +65,7 @@ public class TaskService {
                 .project(project)
                 .assignedTo(assignee)
                 .build());
-
-        //notify the assignee to email
-        notificationService.sendTaskNotification(assignee.getName(), savedTask.getTaskName(), assignee.getEmail());
+        eventPublisher.publishEvent(new SendTaskNotificationDTO(savedTask));
 
         return CreateTaskResponse.builder()
                 .id(savedTask.getId())
